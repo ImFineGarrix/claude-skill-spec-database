@@ -467,11 +467,14 @@ CREATE TABLE ... ;
 
 ### ROLLBACK File (บังคับ — แยกออกจาก PACK_INSTALL)
 
-- `ROLLBACK_<Module>.sql` — DROP statements reverse order:
+- `ROLLBACK_<Module>.sql` — DROP statements reverse order
+- **🚨 No GO statements (MSSQL — บังคับ Rule 10):** ห้ามใช้ `GO` ใน ROLLBACK เช่นเดียวกับ PACK_INSTALL — เพื่อ portability + atomic teardown ผ่าน programmatic deploy
   ```sql
   -- ============================================================
   -- ROLLBACK_<Module>.sql — Teardown script
+  -- DBMS: MSSQL v<Version>   Module: <Module>
   -- WARNING: Data Loss — backup ก่อนรัน
+  -- 🚨 NO GO statements — รองรับ sqlcmd / programmatic deploy
   -- ============================================================
   USE <db_name>;
   DROP TABLE IF EXISTS dbo.<child_table>;  -- child first
@@ -480,6 +483,7 @@ CREATE TABLE ... ;
   USE master;
   DROP DATABASE IF EXISTS <db_name>;
   ```
+- **Lint Check ก่อนส่ง:** Grep หา `^\s*GO\s*$` (standalone GO) — Pass = 0 occurrences
 
 ### Convert File (เฉพาะ Mode Convert)
 

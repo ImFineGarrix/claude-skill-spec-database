@@ -47,6 +47,9 @@ Skill นี้ Generate **Sample Data** สำหรับ:
   - INSERT order ตาม dependency (Parent → Child → Junction) สอดคล้องกับ FK
   - ใช้ Dialect ของ DBMS ที่เลือก
   - Comment กำกับ section ของแต่ละ table
+  - **🚨 No GO statements (MSSQL — บังคับ Rule 10):** ห้ามใช้ `GO` ใน INSERT file — INSERT statements เป็น DML ที่ใช้ `;` terminator ได้ปกติ ไม่ต้องการ batch separator
+    - Header ของไฟล์ต้องระบุ comment: `-- 🚨 NO GO statements (MSSQL) — รองรับ sqlcmd / programmatic deploy`
+    - **Lint Check ก่อนส่ง (MSSQL only):** Grep INSERT file หา `^\s*GO\s*$` (standalone GO) — Pass = 0 occurrences
 - **Reference / Lookup Table Flow (บังคับ):** ก่อนเริ่ม Generate ต้อง **ถาม SA ก่อน** ว่าตารางใดเป็น Reference / Lookup Table
   - ถ้า SA ระบุว่าเป็น Reference Table + ให้ข้อมูล (เช่น status: active/inactive/deleted) → ใส่ตามข้อมูลที่ SA ให้ (ไม่บังคับ 10 records)
   - ถ้า SA **ไม่ได้** ให้ข้อมูล Reference Table → **ไม่ต้องสร้าง Sample Data** สำหรับตารางนั้น (skip) + Note ไว้ใน Output ว่ารอ SA fill
